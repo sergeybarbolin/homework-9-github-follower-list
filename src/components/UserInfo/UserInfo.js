@@ -1,19 +1,48 @@
 import React, { PureComponent } from 'react';
 import styles from './UserInfo.module.css';
-
+import { getData, getIsLoading, getError } from './../../modules/User/reducer';
+import { fetchRequest } from './../../modules/User';
 import { connect } from 'react-redux';
 
 class UserInfo extends PureComponent {
+  
   render() {
-    // Покажите статус загрузки
-    // Если данные не были загружены - сообщите об этом пользователю
+    const { data, isLoading, error } = this.props;
+
+    if (isLoading) {
+      return <p>Loading...</p>
+    }
+
+    if (error) { 
+      return <p>{error}</p>
+    }
+
+    if (!data) {
+      return <p className="t-no-user-info">Not find user</p>
+    }
+
     return (
-      <div className={styles.root}>
-        {/* Отобразите данные о пользователе */}
+      <div className={ styles.root }>
+        <div className={ styles.imageWrapper }>
+          <img className={ styles.image } src={ data.avatar_url } alt="user info"/>
+        </div>
+
+        <div>
+          <p className="t-user-name">{data.name}</p>
+        </div>
       </div>
     );
   }
 }
 
-// Используйте поля data, isLoading из стейта
-export default connect(state => ({}))(UserInfo);
+const mapStateToProps = state => ({
+  data: getData(state),
+  isLoading: getIsLoading(state),
+  error: getError(state)
+});
+const mapDispatchToProps = { fetchRequest };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UserInfo);
